@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Session</title>
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Handlee', cursive;
+            color: #fff;
+            background: url('1121.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* This ensures the body takes up the full viewport height */
+            overflow: hidden; /* This prevents the page from scrolling */
+        }
+
+        .container {
+            position: relative;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            padding: 25px 30px;
+        }
+
+        #date {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            color: #ffcc70;
+        }
+
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 100px;
+        }
+
+        .time {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 5rem;
+            font-weight: 800;
+            margin: 20px 0;
+            background: transparent;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: none;
+        }
+
+        .timer-controls, .stopwatch-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mode-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-buttons button {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid #ffcc70;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .mode-buttons button.active {
+            background: #ffcc70;
+            color: #000;
+            transform: scale(1.05);
+            font-weight: bold;
+        }
+
+        .mode-buttons button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .timer-controls button, .stopwatch-controls button {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffcc70;
+            border: 2px solid #ffcc70;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .timer-controls button:hover, .stopwatch-controls button:hover {
+            background: #ffcc70;
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Stats */
+        .stats-section {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .stats-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stats-cards {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            min-width: 100px;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #ffcc70;
+        }
+        
+        .stat-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .stat-card .time-label {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin: 5px 0 0;
+        }
+
+        .stat-card .session-count {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            margin: 5px 0;
+        }
+
+        .icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Full-screen Button Styling */
+        .fullscreen-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffcc70;
+            border: 2px solid #ffcc70;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .fullscreen-button:hover {
+            background: #ffcc70;
+            color: #000;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="date"></div>
+
+        <div class="timer-container">
+            <div class="time" id="display">01:00:00</div>
+            
+            <div class="mode-buttons">
+                <button id="studyModeBtn" class="active">Study</button>
+                <button id="shortBreakBtn">Short Break</button>
+                <button id="longBreakBtn">Long Break</button>
+            </div>
+
+            <div id="pomodoroControls" class="timer-controls">
+                <button onclick="startPomodoro()">Start</button>
+                <button onclick="pausePomodoro()">Pause</button>
+                <button onclick="resetPomodoro()">Reset</button>
+            </div>
+
+            <div id="stopwatchControls" class="stopwatch-controls" style="display: none;">
+                <button onclick="startStopwatch()">Start</button>
+                <button onclick="stopStopwatch()">Stop</button>
+                <button onclick="resetStopwatch()">Reset</button>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2>📊 Stats</h2>
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <span class="icon">📚</span>
+                    <h3 id="studyTime">00:00:00</h3>
+                    <p>Study Time</p>
+                    <p class="time-label">Sessions: <span id="studyCount">0</span></p>
+                </div>
+                <div class="stat-card">
+                    <span class="icon">☕</span>
+                    <h3 id="shortBreakTime">00:00:00</h3>
+                    <p>Short Break</p>
+                    <p class="time-label">Sessions: <span id="shortBreakCount">0</span></p>
+                </div>
+                <div class="stat-card">
+                    <span class="icon">🌙</span>
+                    <h3 id="longBreakTime">00:00:00</h3>
+                    <p>Long Breaks</p>
+                    <p class="time-label">Sessions: <span id="longBreakCount">0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="fullscreen-button" onclick="toggleFullscreen()">
+            <i class="fas fa-expand-arrows-alt"></i>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const display = document.getElementById('display');
+        const studyModeBtn = document.getElementById('studyModeBtn');
+        const shortBreakBtn = document.getElementById('shortBreakBtn');
+        const longBreakBtn = document.getElementById('longBreakBtn');
+        const pomodoroControls = document.getElementById('pomodoroControls');
+        const stopwatchControls = document.getElementById('stopwatchControls');
+        const studyTimeEl = document.getElementById('studyTime');
+        const shortBreakTimeEl = document.getElementById('shortBreakTime');
+        const longBreakTimeEl = document.getElementById('longBreakTime');
+        const studyCountEl = document.getElementById('studyCount');
+        const shortBreakCountEl = document.getElementById('shortBreakCount');
+        const longBreakCountEl = document.getElementById('longBreakCount');
+
+        // State Variables
+        let timerInterval;
+        let pomodoroMinutes = 60;
+        let pomodoroSeconds = 0;
+        let isPomodoroRunning = false;
+        let isStudyMode = true;
+
+        let stopwatchInterval;
+        let stopwatchHours = 0;
+        let stopwatchMinutes = 0;
+        let stopwatchSeconds = 0;
+        let isStopwatchRunning = false;
+
+        let totalStudyTime = 0;
+        let totalShortBreakTime = 0;
+        let totalLongBreakTime = 0;
+        let studySessions = 0;
+        let shortBreakSessions = 0;
+        let longBreakSessions = 0;
+
+        // --- Date Function ---
+        function updateDate() {
+            const dateElement = document.getElementById("date");
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+            dateElement.textContent = today.toLocaleDateString('en-US', options);
+        }
+        updateDate();
+
+        // Helper function to format seconds to hh:mm:ss
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const hrs = String(hours).padStart(2, '0');
+            const mins = String(minutes).padStart(2, '0');
+            const secs = String(seconds).padStart(2, '0');
+            return `${hrs}:${mins}:${secs}`;
+        }
+
+        // Update stats display
+        function updateStatsDisplay() {
+            studyTimeEl.textContent = formatTime(totalStudyTime);
+            shortBreakTimeEl.textContent = formatTime(totalShortBreakTime);
+            longBreakTimeEl.textContent = formatTime(totalLongBreakTime);
+            studyCountEl.textContent = studySessions;
+            shortBreakCountEl.textContent = shortBreakSessions;
+            longBreakCountEl.textContent = longBreakSessions;
+        }
+
+        // --- Timer Functions (Study & Short Break) ---
+        function updateDisplay(h, m, s) {
+            const hrs = String(h).padStart(2, '0');
+            const mins = String(m).padStart(2, '0');
+            const secs = String(s).padStart(2, '0');
+            display.textContent = `${hrs}:${mins}:${secs}`;
+        }
+
+        function startPomodoro() {
+            if (isPomodoroRunning) return;
+            isPomodoroRunning = true;
+            clearInterval(stopwatchInterval);
+            isStopwatchRunning = false;
+
+            timerInterval = setInterval(() => {
+                if (pomodoroSeconds === 0) {
+                    if (pomodoroMinutes === 0) {
+                        clearInterval(timerInterval);
+                        isPomodoroRunning = false;
+                        if (isStudyMode) {
+                            studySessions++;
+                            alert("Study session completed!");
+                        } else {
+                            shortBreakSessions++;
+                            alert("Short break completed!");
+                        }
+                        updateStatsDisplay();
+                        return;
+                    }
+                    pomodoroMinutes--;
+                    pomodoroSeconds = 59;
+                } else {
+                    pomodoroSeconds--;
+                }
+                
+                const hours = Math.floor(pomodoroMinutes / 60);
+                const minutes = pomodoroMinutes % 60;
+                updateDisplay(hours, minutes, pomodoroSeconds);
+
+                if (isStudyMode) {
+                    totalStudyTime++;
+                } else {
+                    totalShortBreakTime++;
+                }
+                updateStatsDisplay();
+            }, 1000);
+        }
+
+        function pausePomodoro() {
+            clearInterval(timerInterval);
+            isPomodoroRunning = false;
+        }
+
+        function resetPomodoro() {
+            pausePomodoro();
+            if (isStudyMode) {
+                pomodoroMinutes = 60;
+                pomodoroSeconds = 0;
+                updateDisplay(1, 0, 0);
+            } else {
+                pomodoroMinutes = 5;
+                pomodoroSeconds = 0;
+                updateDisplay(0, 5, 0);
+            }
+        }
+
+        // --- Stopwatch Functions (Long Break) ---
+        function startStopwatch() {
+            if (isStopwatchRunning) return;
+            isStopwatchRunning = true;
+            clearInterval(timerInterval);
+            isPomodoroRunning = false;
+
+            stopwatchInterval = setInterval(() => {
+                stopwatchSeconds++;
+                if (stopwatchSeconds === 60) {
+                    stopwatchSeconds = 0;
+                    stopwatchMinutes++;
+                    if (stopwatchMinutes === 60) {
+                        stopwatchMinutes = 0;
+                        stopwatchHours++;
+                    }
+                }
+                updateDisplay(stopwatchHours, stopwatchMinutes, stopwatchSeconds);
+                totalLongBreakTime++;
+                updateStatsDisplay();
+            }, 1000);
+        }
+
+        function stopStopwatch() {
+            if (!isStopwatchRunning) return;
+            clearInterval(stopwatchInterval);
+            isStopwatchRunning = false;
+            longBreakSessions++;
+            updateStatsDisplay();
+        }
+
+        function resetStopwatch() {
+            clearInterval(stopwatchInterval);
+            isStopwatchRunning = false;
+            stopwatchHours = 0;
+            stopwatchMinutes = 0;
+            stopwatchSeconds = 0;
+            updateDisplay(0, 0, 0);
+        }
+
+        // --- Full-screen Function ---
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // --- Mode Switching Logic ---
+        function switchMode(mode) {
+            clearInterval(timerInterval);
+            clearInterval(stopwatchInterval);
+            isPomodoroRunning = false;
+            isStopwatchRunning = false;
+            
+            document.querySelectorAll('.mode-buttons button').forEach(btn => btn.classList.remove('active'));
+
+            if (mode === 'study') {
+                isStudyMode = true;
+                pomodoroMinutes = 60;
+                pomodoroSeconds = 0;
+                updateDisplay(1, 0, 0);
+                studyModeBtn.classList.add('active');
+                pomodoroControls.style.display = 'flex';
+                stopwatchControls.style.display = 'none';
+            } else if (mode === 'shortBreak') {
+                isStudyMode = false;
+                pomodoroMinutes = 5;
+                pomodoroSeconds = 0;
+                updateDisplay(0, 5, 0);
+                shortBreakBtn.classList.add('active');
+                pomodoroControls.style.display = 'flex';
+                stopwatchControls.style.display = 'none';
+            } else if (mode === 'longBreak') {
+                longBreakBtn.classList.add('active');
+                updateDisplay(0, 0, 0);
+                pomodoroControls.style.display = 'none';
+                stopwatchControls.style.display = 'flex';
+            }
+        }
+
+        // Event listeners for mode buttons
+        studyModeBtn.addEventListener('click', () => switchMode('study'));
+        shortBreakBtn.addEventListener('click', () => switchMode('shortBreak'));
+        longBreakBtn.addEventListener('click', () => switchMode('longBreak'));
+
+        // Initial setup
+        switchMode('study');
+        updateStatsDisplay();
+    </script>
+</body>
+</html>
